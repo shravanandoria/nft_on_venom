@@ -1,0 +1,1273 @@
+.version sol 0.61.2
+
+.macro constructor
+DROP
+GETGLOB 2
+ISNULL
+IFREF {
+	CALL $c4_to_c7_with_init_storage$
+}
+GETGLOB 6
+THROWIF 51
+OVER
+PUSHCONT {
+	LDREF
+	ENDS
+	CTOS
+}
+IF
+LDMSGADDR
+LDREF
+ENDS
+CTOS
+LDMSGADDR
+ENDS
+.loc ../contracts/Marketplace.tsol, 54
+ACCEPT
+.loc ../contracts/Marketplace.tsol, 55
+PUSHINT 200000000
+PUSHINT 0
+RAWRESERVE
+.loc ../contracts/Marketplace.tsol, 57
+SWAP
+SETGLOB 12
+.loc ../contracts/Marketplace.tsol, 59
+PUSHINT 100000000
+MYADDR
+GETGLOB 12
+NEWC
+STSLICECONST x62_
+STSLICE
+PUSHINT 2820045005182170565370280386138670788247553
+STUR 143
+ROTREV
+PUSHSLICE x31edd4c749b2f6d7
+NEWC
+STSLICE
+STSLICE
+STU 128
+STBREFR
+ENDC
+PUSHINT 1
+SENDRAWMSG
+.loc ../contracts/Marketplace.tsol, 67
+NEWC
+STSLICECONST x42_
+STSLICE
+PUSHINT 111
+STZEROES
+ENDC
+PUSHPOW2 7
+SENDRAWMSG
+.loc ../contracts/Marketplace.tsol, 0
+CALLREF {
+	CALL $c7_to_c4$
+}
+THROW 0
+
+.macro onTokenWallet
+DROP
+GETGLOB 6
+THROWIFNOT 76
+GETGLOB 2
+ISNULL
+IFREF {
+	CALL $c4_to_c7$
+}
+.loc ../contracts/Marketplace.tsol, 70
+OVER
+PUSHCONT {
+	LDREF
+	ENDS
+	CTOS
+}
+IF
+LDMSGADDR
+ENDS
+.loc ../contracts/Marketplace.tsol, 0
+CALLREF {
+	CALL $onTokenWallet_internal_macro$
+}
+DROP
+CALLREF {
+	CALL $c7_to_c4$
+}
+THROW 0
+
+.macro onTokenWallet_internal_macro
+.loc ../contracts/Marketplace.tsol, 71
+GETGLOB 9
+PARSEMSGADDR
+INDEX 3
+PLDU 256
+NEQINT 0
+GETGLOB 9
+GETGLOB 12
+SDEQ
+AND
+THROWIFNOT 101
+.loc ../contracts/Marketplace.tsol, 76
+PUSHINT 200000000
+PUSHINT 0
+RAWRESERVE
+.loc ../contracts/Marketplace.tsol, 78
+SETGLOB 13
+.loc ../contracts/Marketplace.tsol, 79
+GETGLOB 11
+NEWC
+STSLICECONST x42_
+STSLICE
+PUSHINT 111
+STZEROES
+ENDC
+PUSHPOW2 7
+SENDRAWMSG
+.loc ../contracts/Marketplace.tsol, 0
+
+.macro onNftTransfer
+DROP
+GETGLOB 6
+THROWIFNOT 76
+GETGLOB 2
+ISNULL
+IFREF {
+	CALL $c4_to_c7$
+}
+.loc ../contracts/Marketplace.tsol, 83
+OVER
+PUSHCONT {
+	LDREF
+	ENDS
+	CTOS
+}
+IF
+LDU 256
+LDMSGADDR
+LDREF
+ENDS
+CTOS
+LDMSGADDR
+LDREF
+ENDS
+CTOS
+LDMSGADDR
+LDREF
+ENDS
+CTOS
+LDMSGADDR
+LDREF
+ENDS
+CTOS
+LDMSGADDR
+LDREF
+ENDS
+CTOS
+LDMSGADDR
+LDREF
+ENDS
+.loc ../contracts/Marketplace.tsol, 0
+CALLREF {
+	CALL $onNftTransfer_internal_macro$
+}
+DROP
+CALLREF {
+	CALL $c7_to_c4$
+}
+THROW 0
+
+.macro onNftTransfer_internal_macro
+.loc ../contracts/Marketplace.tsol, 93
+BLKDROP 3
+PUSHINT 200000000
+PUSHINT 0
+RAWRESERVE
+.loc ../contracts/Marketplace.tsol, 95
+GETGLOB 14
+.loc ../contracts/Marketplace.tsol, 96
+DUP
+GETGLOB 9
+ROLL 5
+ROLL 4
+PUSHINT 100000000
+TRUE
+TUPLE 6
+.loc ../contracts/Marketplace.tsol, 104
+GETGLOB 15
+OVER
+XCHG S2, S3
+CALLREF {
+	UNTUPLE 6
+	REVERSE 6, 0
+	NEWC
+	STU 256
+	STSLICE
+	ROLLREV 4
+	NEWC
+	STSLICE
+	ROLLREV 3
+	NEWC
+	STSLICE
+	STU 128
+	STI 1
+	STBREFR
+	STBREFR
+}
+ENDC
+ROTREV
+PUSHPOW2 8
+DICTUSETREF
+SETGLOB 15
+.loc ../contracts/Marketplace.tsol, 105
+GETGLOB 9
+GETGLOB 16
+ROT
+CALLREF {
+	UNTUPLE 6
+	REVERSE 6, 0
+	NEWC
+	STU 256
+	STSLICE
+	ROLLREV 4
+	NEWC
+	STSLICE
+	ROLLREV 3
+	NEWC
+	STSLICE
+	STU 128
+	STI 1
+	STBREFR
+	STBREFR
+}
+ENDC
+ROTREV
+PUSHINT 267
+DICTSETREF
+SETGLOB 16
+.loc ../contracts/Marketplace.tsol, 0
+BLKDROP 3
+
+.macro listToken
+DROP
+GETGLOB 6
+THROWIFNOT 76
+GETGLOB 2
+ISNULL
+IFREF {
+	CALL $c4_to_c7$
+}
+.loc ../contracts/Marketplace.tsol, 108
+OVER
+PUSHCONT {
+	LDREF
+	ENDS
+	CTOS
+}
+IF
+LDMSGADDR
+LDU 128
+ENDS
+.loc ../contracts/Marketplace.tsol, 0
+CALLREF {
+	CALL $listToken_internal_macro$
+}
+DROP
+CALLREF {
+	CALL $c7_to_c4$
+}
+THROW 0
+
+.globl	listToken_internal
+.type	listToken_internal, @function
+CALL $listToken_internal_macro$
+
+.macro listToken_internal_macro
+.loc ../contracts/Marketplace.tsol, 112
+GETGLOB 14
+.loc ../contracts/Marketplace.tsol, 116
+PUSH2 S0, S2
+GETGLOB 9
+MYADDR
+PUSH S5
+TRUE
+TUPLE 6
+.loc ../contracts/Marketplace.tsol, 124
+OVER
+GETGLOB 15
+PUSH S2
+CALLREF {
+	UNTUPLE 6
+	REVERSE 6, 0
+	NEWC
+	STU 256
+	STSLICE
+	ROLLREV 4
+	NEWC
+	STSLICE
+	ROLLREV 3
+	NEWC
+	STSLICE
+	STU 128
+	STI 1
+	STBREFR
+	STBREFR
+}
+ENDC
+ROTREV
+PUSHPOW2 8
+DICTUSETREF
+SETGLOB 15
+.loc ../contracts/Marketplace.tsol, 125
+PUSH S3
+GETGLOB 16
+ROT
+CALLREF {
+	UNTUPLE 6
+	REVERSE 6, 0
+	NEWC
+	STU 256
+	STSLICE
+	ROLLREV 4
+	NEWC
+	STSLICE
+	ROLLREV 3
+	NEWC
+	STSLICE
+	STU 128
+	STI 1
+	STBREFR
+	STBREFR
+}
+ENDC
+ROTREV
+PUSHINT 267
+DICTSETREF
+SETGLOB 16
+.loc ../contracts/Marketplace.tsol, 127
+GETGLOB 14
+INC
+SETGLOB 14
+.loc ../contracts/Marketplace.tsol, 128
+TRUE
+ROT
+MYADDR
+GETGLOB 9
+BLKSWAP 2, 4
+PUSHSLICE xc0000000000000000000000001
+NEWC
+STSLICE
+ROLLREV 6
+NEWC
+STSLICECONST x17604f4d
+STU 256
+STSLICE
+ROLLREV 4
+NEWC
+STSLICE
+ROLLREV 3
+NEWC
+STSLICE
+STU 128
+STI 1
+STBREFR
+STBREFR
+STBREFR
+ENDC
+PUSHINT 0
+SENDRAWMSG
+.loc ../contracts/Marketplace.tsol, 0
+
+.macro finishAuction
+DROP
+GETGLOB 6
+THROWIFNOT 76
+GETGLOB 2
+ISNULL
+IFREF {
+	CALL $c4_to_c7$
+}
+.loc ../contracts/Marketplace.tsol, 138
+OVER
+PUSHCONT {
+	LDREF
+	ENDS
+	CTOS
+}
+IF
+LDMSGADDR
+LDREF
+ENDS
+CTOS
+LDMSGADDR
+ENDS
+.loc ../contracts/Marketplace.tsol, 0
+CALLREF {
+	CALL $finishAuction_internal_macro$
+}
+DROP
+CALLREF {
+	CALL $c7_to_c4$
+}
+THROW 0
+
+.globl	finishAuction_internal
+.type	finishAuction_internal, @function
+CALL $finishAuction_internal_macro$
+
+.macro finishAuction_internal_macro
+.loc ../contracts/Marketplace.tsol, 143
+DEPTH
+ADDCONST -2
+PICK
+PUSHINT 1000000000
+GEQ
+THROWIFNOT 103
+.loc ../contracts/Marketplace.tsol, 145
+PUSHINT 200000000
+PUSHINT 0
+RAWRESERVE
+.loc ../contracts/Marketplace.tsol, 147
+GETGLOB 16
+PUSHINT 267
+DICTGETREF
+PUSHCONT {
+	CTOS
+	CALLREF {
+		LDU 256
+		LDMSGADDR
+		LDREF
+		ENDS
+		CTOS
+		LDMSGADDR
+		LDREF
+		ENDS
+		CTOS
+		LDMSGADDR
+		LDU 128
+		LDI 1
+		ENDS
+		TUPLE 6
+	}
+}
+PUSHCONT {
+	PUSHINT 0
+	PUSHREFSLICE {
+		.blob x8000000000000000000000000000000000000000000000000000000000000000001_
+	}
+	BLKPUSH 2, 0
+	PUSHINT 0
+	DUP
+	TUPLE 6
+}
+IFELSE
+.loc ../contracts/Marketplace.tsol, 148
+DUP
+INDEX 4
+.loc ../contracts/Marketplace.tsol, 150
+DEPTH
+ADDCONST -2
+PICK
+EQUAL
+THROWIFNOT 101
+.loc ../contracts/Marketplace.tsol, 154
+FALSE
+SETINDEX 5
+.loc ../contracts/Marketplace.tsol, 155
+GETGLOB 9
+SETINDEX 2
+.loc ../contracts/Marketplace.tsol, 158
+PUSHREF {
+}
+.loc ../contracts/Marketplace.tsol, 159
+NEWDICT
+PUSH S3
+GETGLOB 9
+PUSH S4
+SECOND
+FALSE
+NEWC
+STSLICECONST x6_
+STI 1
+STSLICECONST x1_
+STSLICE
+PUSHINT 2803819077499249229031122585109857988247553
+STUR 143
+ROLLREV 3
+NEWC
+STSLICECONST x11dd9e92
+STSLICE
+ROTREV
+NEWC
+STSLICE
+STDICT
+STBREFR
+STBREFR
+ENDC
+PUSHINT 1
+SENDRAWMSG
+.loc ../contracts/Marketplace.tsol, 169
+TRUE
+ROLL 3
+PUSHINT 100000000
+PUSH S4
+THIRD
+ROLL 5
+INDEX 4
+GETGLOB 13
+NEWC
+STSLICECONST x62_
+STSLICE
+PUSHINT 1
+STUR 111
+ROLLREV 6
+NEWC
+STSLICECONST x73e22143
+STU 128
+STSLICE
+STU 128
+ROLLREV 3
+NEWC
+STSLICE
+STI 1
+STREF
+STBREFR
+STBREFR
+ENDC
+PUSHPOW2 7
+SENDRAWMSG
+.loc ../contracts/Marketplace.tsol, 0
+
+.macro getAllNFTs
+DROP
+GETGLOB 6
+THROWIFNOT 76
+GETGLOB 2
+ISNULL
+IFREF {
+	CALL $c4_to_c7$
+}
+.loc ../contracts/Marketplace.tsol, 179
+ENDS
+.loc ../contracts/Marketplace.tsol, 0
+CALLREF {
+	CALL $getAllNFTs_internal_macro$
+}
+OVER
+PUSHCONT {
+	PUSH S3
+	CTOS
+	LDU 2
+	LDMSGADDR
+	DROP
+	NIP
+	NEWC
+	STSLICECONST xc
+	STSLICE
+	PUSHINT 4265696149
+	STUR 130
+	SWAP
+	UNPAIR
+	XCHG S2
+	STU 32
+	STDICT
+	ENDC
+	PUSHINT 0
+	SENDRAWMSG
+}
+PUSHCONT {
+	DROP
+}
+IFELSE
+IFREF {
+	CALL $upd_only_time_in_c4$
+}
+THROW 0
+
+.globl	getAllNFTs_internal
+.type	getAllNFTs_internal, @function
+CALL $getAllNFTs_internal_macro$
+
+.macro getAllNFTs_internal_macro
+.loc ../contracts/Marketplace.tsol, 180
+GETGLOB 14
+.loc ../contracts/Marketplace.tsol, 181
+DUP
+PUSHREF
+.compute $default_tuple_builder_t_uint256_t_address_t_address_t_address_t_uint128_t_bool$
+PUSHINT 0
+NEWDICT
+PUSH S3
+PUSHCONT {
+	BLKPUSH 2, 2
+	INC
+	XCHG S3
+	ROT
+	PUSHINT 32
+	DICTUSETREF
+}
+REPEAT
+BLKDROP2 2, 1
+PAIR
+.loc ../contracts/Marketplace.tsol, 182
+PUSHINT 0
+DUP
+.loc ../contracts/Marketplace.tsol, 183
+PUSHCONT {
+	PUSH2 S0, S3
+	LESS
+}
+PUSHCONT {
+	.loc ../contracts/Marketplace.tsol, 184
+	DUP
+	GETGLOB 15
+	PUSHPOW2 8
+	DICTUGETREF
+	PUSHCONT {
+		CTOS
+		CALLREF {
+			LDU 256
+			LDMSGADDR
+			LDREF
+			ENDS
+			CTOS
+			LDMSGADDR
+			LDREF
+			ENDS
+			CTOS
+			LDMSGADDR
+			LDU 128
+			LDI 1
+			ENDS
+			TUPLE 6
+		}
+	}
+	PUSHCONT {
+		PUSHINT 0
+		PUSHREFSLICE {
+			.blob x8000000000000000000000000000000000000000000000000000000000000000001_
+		}
+		BLKPUSH 2, 0
+		PUSHINT 0
+		DUP
+		TUPLE 6
+	}
+	IFELSE
+	THIRD
+	PUSHREFSLICE {
+		.blob x8000000000000000000000000000000000000000000000000000000000000000001_
+	}
+	SDEQ
+	PUSHCONT {
+		.loc ../contracts/Marketplace.tsol, 185
+		DUP
+		GETGLOB 15
+		PUSHPOW2 8
+		DICTUGETREF
+		PUSHCONT {
+			CTOS
+			CALLREF {
+				LDU 256
+				LDMSGADDR
+				LDREF
+				ENDS
+				CTOS
+				LDMSGADDR
+				LDREF
+				ENDS
+				CTOS
+				LDMSGADDR
+				LDU 128
+				LDI 1
+				ENDS
+				TUPLE 6
+			}
+		}
+		PUSHCONT {
+			PUSHINT 0
+			PUSHREFSLICE {
+				.blob x8000000000000000000000000000000000000000000000000000000000000000001_
+			}
+			BLKPUSH 2, 0
+			PUSHINT 0
+			DUP
+			TUPLE 6
+		}
+		IFELSE
+		.loc ../contracts/Marketplace.tsol, 186
+		PUSH S3
+		UNPAIR
+		PUXC S4, S-1
+		PUSH2 S1, S2
+		LESS
+		THROWIFNOT 50
+		ROLL 3
+		CALLREF {
+			UNTUPLE 6
+			REVERSE 6, 0
+			NEWC
+			STU 256
+			STSLICE
+			ROLLREV 4
+			NEWC
+			STSLICE
+			ROLLREV 3
+			NEWC
+			STSLICE
+			STU 128
+			STI 1
+			STBREFR
+			STBREFR
+		}
+		ENDC
+		ROTREV
+		PUSHINT 32
+		DICTUSETREF
+		PAIR
+		POP S3
+		.loc ../contracts/Marketplace.tsol, 187
+		OVER
+		INC
+		POP S2
+		.loc ../contracts/Marketplace.tsol, 0
+	}
+	IFNOT
+	.loc ../contracts/Marketplace.tsol, 183
+	INC
+	.loc ../contracts/Marketplace.tsol, 0
+}
+WHILE
+DROP2
+.loc ../contracts/Marketplace.tsol, 190
+NIP
+.loc ../contracts/Marketplace.tsol, 0
+
+.macro get_nft_by_address
+DROP
+GETGLOB 6
+THROWIFNOT 76
+GETGLOB 2
+ISNULL
+IFREF {
+	CALL $c4_to_c7$
+}
+.loc ../contracts/Marketplace.tsol, 193
+OVER
+PUSHCONT {
+	LDREF
+	ENDS
+	CTOS
+}
+IF
+LDMSGADDR
+ENDS
+.loc ../contracts/Marketplace.tsol, 0
+CALLREF {
+	CALL $get_nft_by_address_internal_macro$
+}
+OVER
+PUSHCONT {
+	PUSH S3
+	CTOS
+	LDU 2
+	LDMSGADDR
+	DROP
+	NIP
+	NEWC
+	STSLICECONST xc
+	STSLICE
+	PUSHINT 1
+	STUR 98
+	SWAP
+	NEWC
+	STSLICECONST x822716a4
+	SWAP
+	UNTUPLE 6
+	REVERSE 7, 0
+	STU 256
+	STSLICE
+	ROLLREV 4
+	NEWC
+	STSLICE
+	ROLLREV 3
+	NEWC
+	STSLICE
+	STU 128
+	STI 1
+	STBREFR
+	STBREFR
+	STBREFR
+	ENDC
+	PUSHINT 0
+	SENDRAWMSG
+}
+PUSHCONT {
+	DROP
+}
+IFELSE
+IFREF {
+	CALL $upd_only_time_in_c4$
+}
+THROW 0
+
+.globl	get_nft_by_address_internal
+.type	get_nft_by_address_internal, @function
+CALL $get_nft_by_address_internal_macro$
+
+.macro get_nft_by_address_internal_macro
+.loc ../contracts/Marketplace.tsol, 194
+GETGLOB 16
+PUSHINT 267
+DICTGETREF
+PUSHCONT {
+	CTOS
+	CALLREF {
+		LDU 256
+		LDMSGADDR
+		LDREF
+		ENDS
+		CTOS
+		LDMSGADDR
+		LDREF
+		ENDS
+		CTOS
+		LDMSGADDR
+		LDU 128
+		LDI 1
+		ENDS
+		TUPLE 6
+	}
+}
+PUSHCONT {
+	PUSHINT 0
+	PUSHREFSLICE {
+		.blob x8000000000000000000000000000000000000000000000000000000000000000001_
+	}
+	BLKPUSH 2, 0
+	PUSHINT 0
+	DUP
+	TUPLE 6
+}
+IFELSE
+.loc ../contracts/Marketplace.tsol, 0
+
+.macro c4_to_c7
+PUSHROOT
+CTOS
+LDU 256 ; pubkey c4
+LDU 64 ; pubkey timestamp c4
+LDU 1 ; ctor flag
+NIP
+LDU 256
+LDREF
+ENDS
+CTOS
+LDMSGADDR
+LDREF
+ENDS
+CTOS
+LDMSGADDR
+LDREF
+ENDS
+CTOS
+LDMSGADDR
+LDU 256
+LDDICT
+LDDICT
+ENDS
+SETGLOB 16
+SETGLOB 15
+SETGLOB 14
+SETGLOB 13
+SETGLOB 12
+SETGLOB 11
+SETGLOB 10
+SETGLOB 3
+SETGLOB 2
+
+.macro c4_to_c7_with_init_storage
+PUSHROOT
+CTOS
+SBITS
+GTINT 1
+PUSHCONT {
+	PUSHINT 0
+	PUSHROOT
+	CTOS
+	PLDDICT ; D
+	PUSHINT 1
+	OVER
+	PUSHINT 64
+	DICTUGET
+	ZEROSWAPIFNOT
+	PUSHCONT {
+		PLDU 256
+	}
+	IF
+	PUSHINT 2
+	PUSH S2
+	PUSHINT 64
+	DICTUGET
+	PUSHCONT {
+		PUSHREFSLICE {
+			.blob x8000000000000000000000000000000000000000000000000000000000000000001_
+		}
+	}
+	IFNOT
+	PUSHREFSLICE {
+		.blob x8000000000000000000000000000000000000000000000000000000000000000001_
+	}
+	DUP
+	PUSHINT 0
+	NEWDICT
+	DUP
+	SETGLOB 16
+	SETGLOB 15
+	SETGLOB 14
+	SETGLOB 13
+	SETGLOB 12
+	SETGLOB 11
+	SETGLOB 10
+	PUSHINT 64
+	DICTUGET
+	THROWIFNOT 61
+	PLDU 256
+	SETGLOB 2
+	PUSHINT 0 ; timestamp
+	SETGLOB 3
+}
+IFREFELSE {
+	CALL $c4_to_c7$
+}
+
+.macro c7_to_c4
+GETGLOB 16
+GETGLOB 15
+GETGLOB 14
+GETGLOB 13
+GETGLOB 12
+GETGLOB 11
+GETGLOB 10
+GETGLOB 3
+GETGLOB 2
+NEWC
+STU 256
+STU 64
+STONE
+STU 256
+ROLLREV 6
+NEWC
+STSLICE
+ROLLREV 5
+NEWC
+STSLICE
+ROLLREV 4
+NEWC
+STSLICE
+STU 256
+STDICT
+STDICT
+STBREFR
+STBREFR
+STBREFR
+ENDC
+POPROOT
+
+.macro upd_only_time_in_c4
+PUSHROOT
+CTOS
+LDU 256
+LDU 64
+NIP
+GETGLOB 3
+ROT
+NEWC
+STU 256
+STU 64
+STSLICE
+ENDC
+POPROOT
+
+.internal-alias :main_internal, 0
+.internal :main_internal
+PUSHROOT
+CTOS
+SBITS
+NEQINT 1
+SETGLOB 6
+PUSH S2
+CTOS
+LDU 4 ; bounced tail
+LDMSGADDR ; bounced src tail
+DROP
+SETGLOB 9
+MODPOW2 1
+IFRET
+OVER
+SEMPTY ; isEmpty
+IFJMPREF {
+	GETGLOB 6
+	THROWIFNOT 76
+}
+OVER
+LDUQ 32  ; [funcId] body' ok
+THROWIFNOT 60
+OVER
+IFNOTJMPREF {
+	GETGLOB 6
+	THROWIFNOT 76
+}
+SWAP
+CALLREF {
+	CALL $public_function_selector$
+}
+THROW 60
+
+.internal-alias :main_external, -1
+.internal :main_external
+PUSHROOT
+CTOS
+SBITS
+NEQINT 1
+SETGLOB 6
+PUSHREFSLICE {
+	.blob x8000000000000000000000000000000000000000000000000000000000000000001_
+}
+SETGLOB 9
+OVER
+CALLREF {
+	CALL $c4_to_c7_with_init_storage$
+}
+LDU 1 ; haveSign msgSlice
+SWAP
+PUSHCONT {
+	PUSHPOW2 9
+	LDSLICEX ; signatureSlice msgSlice
+	DUP
+	HASHSU ; signatureSlice msgSlice hashMsgSlice
+	SWAP
+	LDU 1 ; signatureSlice hashMsgSlice hasPubkey msgSlice
+	SWAP
+	PUSHCONT {
+		LDU 256 ; signatureSlice hashMsgSlice pubkey msgSlice
+		XCHG S3
+		SWAP
+	}
+	PUSHCONT {
+		XCHG S2
+		GETGLOB 2
+	}
+	IFELSE
+	CHKSIGNU ; msgSlice isSigned
+	THROWIFNOT 40
+}
+PUSHCONT {
+	LDU 1 ; hasPubkey msgSlice
+	SWAP
+	THROWIF 58
+}
+IFELSE
+LDU 64 ; timestamp msgSlice
+SWAP
+CALL $replay_protection_macro$
+LDU 32 ; expireAt msgSlice
+SWAP
+NOW ; msgSlice expireAt now
+GREATER ; msgSlice expireAt>now
+THROWIFNOT 57
+LDU 32 ; funcId body
+SWAP
+CALLREF {
+	CALL $public_function_selector$
+}
+THROW 60
+
+.macro _tokenRoot
+DROP
+ENDS
+CALLREF {
+	CALL $c4_to_c7$
+}
+GETGLOB 12
+OVER
+PUSHCONT {
+	PUSHSLICE xc00000000000000000000000009e88af1c
+	NEWC
+	STSLICE
+	STSLICE
+	ENDC
+	PUSHINT 0
+	SENDRAWMSG
+}
+IF
+THROW 0
+
+.macro _tokenWallet
+DROP
+ENDS
+CALLREF {
+	CALL $c4_to_c7$
+}
+GETGLOB 13
+OVER
+PUSHCONT {
+	PUSHSLICE xc00000000000000000000000008bc1fe2f
+	NEWC
+	STSLICE
+	STSLICE
+	ENDC
+	PUSHINT 0
+	SENDRAWMSG
+}
+IF
+THROW 0
+
+.macro id_listed_token
+DROP
+ENDS
+CALLREF {
+	CALL $c4_to_c7$
+}
+GETGLOB 15
+OVER
+PUSHCONT {
+	PUSHSLICE xc0000000000000000000000000ff2a6c30
+	NEWC
+	STSLICE
+	STDICT
+	ENDC
+	PUSHINT 0
+	SENDRAWMSG
+}
+IF
+THROW 0
+
+.macro address_listed_token
+DROP
+ENDS
+CALLREF {
+	CALL $c4_to_c7$
+}
+GETGLOB 16
+OVER
+PUSHCONT {
+	PUSHSLICE xc0000000000000000000000000fab96dec
+	NEWC
+	STSLICE
+	STDICT
+	ENDC
+	PUSHINT 0
+	SENDRAWMSG
+}
+IF
+THROW 0
+
+.macro default_tuple_builder_t_uint256_t_address_t_address_t_address_t_uint128_t_bool
+PUSHINT 0
+PUSHREFSLICE {
+	.blob x8000000000000000000000000000000000000000000000000000000000000000001_
+}
+BLKPUSH 2, 0
+PUSHINT 0
+DUP
+TUPLE 6
+CALLREF {
+	UNTUPLE 6
+	REVERSE 6, 0
+	NEWC
+	STU 256
+	STSLICE
+	ROLLREV 4
+	NEWC
+	STSLICE
+	ROLLREV 3
+	NEWC
+	STSLICE
+	STU 128
+	STI 1
+	STBREFR
+	STBREFR
+}
+ENDC
+
+.macro public_function_selector
+DUP
+PUSHINT 929939076
+LEQ
+IFJMPREF {
+	DUP
+	PUSHINT 36116132
+	EQUAL
+	IFJMPREF {
+		CALL $get_nft_by_address$
+	}
+	DUP
+	PUSHINT 197262895
+	EQUAL
+	IFJMPREF {
+		CALL $_tokenWallet$
+	}
+	DUP
+	PUSHINT 512274204
+	EQUAL
+	IFJMPREF {
+		CALL $_tokenRoot$
+	}
+	DUP
+	PUSHINT 929939076
+	EQUAL
+	IFJMPREF {
+		CALL $listToken$
+	}
+}
+DUP
+PUSHINT 2058972652
+LEQ
+IFJMPREF {
+	DUP
+	PUSHINT 1158545205
+	EQUAL
+	IFJMPREF {
+		CALL $finishAuction$
+	}
+	DUP
+	PUSHINT 1236465367
+	EQUAL
+	IFJMPREF {
+		CALL $onTokenWallet$
+	}
+	DUP
+	PUSHINT 1241152735
+	EQUAL
+	IFJMPREF {
+		CALL $constructor$
+	}
+	DUP
+	PUSHINT 2058972652
+	EQUAL
+	IFJMPREF {
+		CALL $address_listed_token$
+	}
+}
+DUP
+PUSHINT 2133486640
+LEQ
+IFJMPREF {
+	DUP
+	PUSHINT 2087248313
+	EQUAL
+	IFJMPREF {
+		CALL $onNftTransfer$
+	}
+	DUP
+	PUSHINT 2118212501
+	EQUAL
+	IFJMPREF {
+		CALL $getAllNFTs$
+	}
+	DUP
+	PUSHINT 2133486640
+	EQUAL
+	IFJMPREF {
+		CALL $id_listed_token$
+	}
+}
+

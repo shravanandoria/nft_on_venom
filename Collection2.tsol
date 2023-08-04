@@ -1,0 +1,147 @@
+pragma ever-solidity >=0.61.2;
+
+pragma AbiHeader expire;
+pragma AbiHeader time;
+pragma AbiHeader pubkey;
+
+import "@broxus/tip4/contracts/interfaces/IAcceptNftBurnCallback.tsol";
+import "@broxus/tip4/contracts/interfaces/IBurnableCollection.tsol";
+
+import "@broxus/tip4/contracts/access/OwnableInternal.tsol";
+import "@broxus/tip4/contracts/TIP4_2/TIP4_2Collection.tsol";
+import "@broxus/tip4/contracts/TIP4_3/TIP4_3Collection.tsol";
+
+import "./Nft.tsol";
+
+contract ColletionDrop is TIP4_2Collection, TIP4_3Collection, IBurnableCollection, OwnableInternal {
+  uint64 static nonce_;
+
+  uint8 constant value_is_less_than_required = 104;
+  uint8 constant account_minted_already = 105;
+
+  uint128 _remainOnNft;
+  uint256 _totalMinted;
+  uint128 _mintingFee;
+
+  mapping(address => bool) _minted;
+
+  constructor(
+    TvmCell codeNft,
+    TvmCell codeIndex,
+    TvmCell codeIndexBasis,
+    address owner,
+    uint128 remainOnNft,
+    uint128 mintingFee,
+    string json
+  )
+    public
+    OwnableInternal(owner)
+    TIP4_1Collection(codeNft)
+    TIP4_2Collection(json)
+    TIP4_3Collection(codeIndex, codeIndexBasis)
+  {
+    tvm.accept();
+    tvm.rawReserve(1 ever, 0);
+    _remainOnNft = remainOnNft;
+    _mintingFee = mintingFee;
+  }
+
+  function codeDepth() public view returns (uint16) {
+    return (_buildNftCode(address(this)).depth());
+  }
+
+  function mint(string _json) public virtual {
+    require(!_minted[msg.sender], account_minted_already);
+    require(msg.value > _remainOnNft + _mintingFee + _indexDeployValue * 2 + 0.3 ever, value_is_less_than_required);
+
+    tvm.rawReserve(_mintingFee, 4);
+
+    _minted[msg.sender] = true;
+    _mintNft(msg.sender, _json, 0, 128);
+  }
+
+  function totalMinted() external view responsible returns (uint256 count) {
+    return { value: 0, flag: 64, bounce: false } (_totalMinted);
+  }
+
+  function mintingFee() external view responsible returns (uint128) {
+    return { value: 0, flag: 64, bounce: false } (_mintingFee);
+  }
+
+  function hasMinted(address account) external view responsible returns (bool) {
+    return { value: 0, flag: 64, bounce: false } (_minted[account]);
+  }
+
+  function _mintNft(address owner, string json, uint128 value, uint16 flag) internal virtual {
+    uint256 id = uint256(_totalMinted);
+    _totalMinted++;
+    _totalSupply++;
+
+    TvmCell codeNft = _buildNftCode(address(this));
+    TvmCell stateNft = _buildNftState(codeNft, id);
+    address nftAddr = new Nft{ stateInit: stateNft, value: value, flag: flag }(
+      owner,
+      msg.sender,
+      _remainOnNft,
+      json,
+      _indexDeployValue,
+      _indexDestroyValue,
+      _codeIndex
+    );
+
+    emit NftCreated(id, nftAddr, owner, owner, msg.sender);
+  }
+
+  function setRemainOnNft(uint128 remainOnNft) external virtual onlyOwner {
+    _remainOnNft = remainOnNft;
+  }
+
+  function setMintingFee(uint128 mintingFee) external virtual onlyOwner {
+    _mintingFee = mintingFee;
+  }
+
+  function withdraw(address dest, uint128 value) external onlyOwner {
+    tvm.accept();
+    dest.transfer(value, true);
+  }
+
+  function _buildNftState(
+    TvmCell code,
+    uint256 id
+  ) internal pure virtual override(TIP4_2Collection, TIP4_3Collection) returns (TvmCell) {
+    return tvm.buildStateInit({ contr: Nft, varInit: { _id: id }, code: code });
+  }
+
+  function resolveIndexCodeHash(address collection, address owner) public view returns (uint256 hash) {
+    TvmCell code = _buildIndexCode(collection, owner);
+    return tvm.hash(code);
+  }
+
+  function acceptNftBurn(
+    uint256 _id,
+    address _owner,
+    address _manager,
+    address _sendGasTo,
+    address _callbackTo,
+    TvmCell _callbackPayload
+  ) external override {
+    require(msg.sender.value != 0 && _resolveNft(_id) == msg.sender, 100);
+
+    _totalSupply--;
+    emit NftBurned(_id, msg.sender, _owner, _manager);
+
+    if (_callbackTo.value != 0) {
+      IAcceptNftBurnCallback(_callbackTo).onAcceptNftBurn{ value: 0, flag: 64 + 2, bounce: false }(
+        address(this),
+        _id,
+        msg.sender,
+        _owner,
+        _manager,
+        _sendGasTo,
+        _callbackPayload
+      );
+    } else {
+      _sendGasTo.transfer({ value: 0, flag: 64 + 2, bounce: false });
+    }
+  }
+}

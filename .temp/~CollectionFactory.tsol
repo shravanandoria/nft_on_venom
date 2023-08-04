@@ -1,0 +1,88 @@
+pragma ever-solidity >= 0.61.2;
+
+import "./~Collection.tsol";
+
+contract CollectionFactory {
+
+    TvmCell collection_code;
+    TvmCell codeIndex;
+    TvmCell codeIndexBasis;
+    TvmCell codeNft;
+
+    
+    uint256 private _collectionId;
+    
+    address owner;
+
+    struct NFT_Collection{
+        uint256 collectionId;
+        string json;
+        address owner;
+        address collection_address; 
+    }
+
+    event CollectionCreated (
+        uint256 collectionId,
+        string json,
+        address owner,
+        string collection_address
+    );
+    
+    mapping(address => NFT_Collection[]) private userToCollections;
+    mapping(uint256 => NFT_Collection) private idToCollection;
+    
+    constructor(
+        TvmCell _collection_code,
+        TvmCell _codeNft,
+        TvmCell _codeIndex,
+        TvmCell _codeIndexBasis
+    ) public {
+        tvm.accept();
+
+        owner = msg.sender;
+        collection_code = _collection_code;
+        codeIndex = _codeIndex;
+        codeIndexBasis = _codeIndexBasis;
+        codeNft = _codeNft;
+    }
+
+    function create_collection(
+        string json
+    ) public {
+        tvm.rawReserve(0.5 ever, 0);
+
+        uint256 collectionCount = _collectionId;
+
+        TvmCell _stateInit = tvm.buildStateInit({code: collection_code});
+
+        address collection_address = new Collection{
+            stateInit: _stateInit,
+            value: 0,
+            flag: 128
+        }(
+            codeNft,
+            json,
+            codeIndex,
+            codeIndexBasis
+        );
+
+        
+        userToCollections[msg.sender].push(newCollection);
+        idToCollection[collectionCount] = newCollection;
+        _collectionId = _collectionId + 1;
+    }
+
+    function getAllCollections() public view returns(NFT_Collection[]) {
+        
+        uint256 collectionCount = _collectionId;
+        NFT_Collection[] collections = new NFT_Collection[](collectionCount);
+        require(collectionCount >= 0, "you have not created any collection");
+        for(uint256 i = 0; i < collectionCount; i++){
+            NFT_Collection current_collection = idToCollection[i];
+            collections[i] = current_collection;
+        }
+        return collections;
+    }
+
+
+}
