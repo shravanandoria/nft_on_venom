@@ -4,16 +4,16 @@ pragma AbiHeader expire;
 pragma AbiHeader time;
 pragma AbiHeader pubkey;
 
-import "@broxus/tip4/contracts/interfaces/IAcceptNftBurnCallback.tsol";
-import "@broxus/tip4/contracts/interfaces/IBurnableCollection.tsol";
+import "c:/Users/shrav/Desktop/venom_projs/my-first-nft/node_modules/@broxus/tip4/contracts/interfaces/IAcceptNftBurnCallback.tsol";
+import "c:/Users/shrav/Desktop/venom_projs/my-first-nft/node_modules/@broxus/tip4/contracts/interfaces/IBurnableCollection.tsol";
 
-import "@broxus/tip4/contracts/access/OwnableInternal.tsol";
-import "@broxus/tip4/contracts/TIP4_2/TIP4_2Collection.tsol";
-import "@broxus/tip4/contracts/TIP4_3/TIP4_3Collection.tsol";
+import "c:/Users/shrav/Desktop/venom_projs/my-first-nft/node_modules/@broxus/tip4/contracts/access/OwnableInternal.tsol";
+import "c:/Users/shrav/Desktop/venom_projs/my-first-nft/node_modules/@broxus/tip4/contracts/TIP4_2/TIP4_2Collection.tsol";
+import "c:/Users/shrav/Desktop/venom_projs/my-first-nft/node_modules/@broxus/tip4/contracts/TIP4_3/TIP4_3Collection.tsol";
 
-import "./Nft.tsol";
+import "./~Nft.tsol";
 
-contract ColletionDrop is TIP4_2Collection, TIP4_3Collection, IBurnableCollection, OwnableInternal {
+contract CollectionDrop is TIP4_2Collection, TIP4_3Collection, IBurnableCollection, OwnableInternal {
   uint64 static nonce_;
 
   uint8 constant value_is_less_than_required = 104;
@@ -23,8 +23,10 @@ contract ColletionDrop is TIP4_2Collection, TIP4_3Collection, IBurnableCollectio
   uint256 _totalMinted;
   uint128 _mintingFee;
 
-  mapping(address => bool) _minted;
+  bool minting_paused;
 
+  mapping(address => bool) _minted;
+  
   constructor(
     TvmCell codeNft,
     TvmCell codeIndex,
@@ -51,12 +53,13 @@ contract ColletionDrop is TIP4_2Collection, TIP4_3Collection, IBurnableCollectio
   }
 
   function mint(string _json) public virtual {
+    require(!minting_paused, 101);
     require(!_minted[msg.sender], account_minted_already);
     require(msg.value > _remainOnNft + _mintingFee + _indexDeployValue * 2 + 0.3 ever, value_is_less_than_required);
 
-    tvm.rawReserve(_mintingFee, 4);
+    tvm.rawReserve(_mintingFee, 4 );
 
-    _minted[msg.sender] = true;
+    // _minted[msg.sender] = true;
     _mintNft(msg.sender, _json, 0, 128);
   }
 
@@ -67,12 +70,13 @@ contract ColletionDrop is TIP4_2Collection, TIP4_3Collection, IBurnableCollectio
   function mintingFee() external view responsible returns (uint128) {
     return { value: 0, flag: 64, bounce: false } (_mintingFee);
   }
-
+  
   function hasMinted(address account) external view responsible returns (bool) {
     return { value: 0, flag: 64, bounce: false } (_minted[account]);
   }
 
   function _mintNft(address owner, string json, uint128 value, uint16 flag) internal virtual {
+    require(!minting_paused, 101);
     uint256 id = uint256(_totalMinted);
     _totalMinted++;
     _totalSupply++;
@@ -84,20 +88,28 @@ contract ColletionDrop is TIP4_2Collection, TIP4_3Collection, IBurnableCollectio
       msg.sender,
       _remainOnNft,
       json,
+      _codeIndex,
       _indexDeployValue,
-      _indexDestroyValue,
-      _codeIndex
+      _indexDestroyValue
     );
-
+    
     emit NftCreated(id, nftAddr, owner, owner, msg.sender);
+  }
+
+  function minting_status() external view responsible returns (bool){
+    return { value: 0, flag: 64, bounce: false } (minting_paused);
+  }
+
+  function pause_mint(bool mint_status) public onlyOwner{
+    minting_paused = mint_status;    
   }
 
   function setRemainOnNft(uint128 remainOnNft) external virtual onlyOwner {
     _remainOnNft = remainOnNft;
   }
 
-  function setMintingFee(uint128 mintingFee) external virtual onlyOwner {
-    _mintingFee = mintingFee;
+  function setMintingFee(uint128 mintingFeee) external virtual onlyOwner {
+    _mintingFee = mintingFeee;
   }
 
   function withdraw(address dest, uint128 value) external onlyOwner {
@@ -110,7 +122,7 @@ contract ColletionDrop is TIP4_2Collection, TIP4_3Collection, IBurnableCollectio
     uint256 id
   ) internal pure virtual override(TIP4_2Collection, TIP4_3Collection) returns (TvmCell) {
     return tvm.buildStateInit({ contr: Nft, varInit: { _id: id }, code: code });
-  }
+  }tvm.raw
 
   function resolveIndexCodeHash(address collection, address owner) public view returns (uint256 hash) {
     TvmCell code = _buildIndexCode(collection, owner);

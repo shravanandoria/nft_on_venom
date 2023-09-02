@@ -5,7 +5,7 @@ import { Account } from "everscale-standalone-client";
 import { ContractData } from "locklift/internal/factory";
 import { zeroAddress } from "locklift"; 
 let marketplace: Contract<FactorySource["Marketplace"]>;
-let collection: Contract<FactorySource["Collection"]>;
+let collection: Contract<FactorySource["newCollection"]>;
 let signer: any;
 let someAccount: Account;
 let nft: Contract<FactorySource["Nft"]>;
@@ -42,50 +42,31 @@ describe("Test Marketplace Contract", async function () {
 
     it("Deploy Collection contract", async function () {      
     //COLLECTION CONTRACT DEPLOY
-    const { contract: collectionContract } = await locklift.factory.deployContract({
-      contract: "Collection",
-      publicKey: signer.publicKey,
-      initParams: {},
-      constructorParams: {
-        codeNft: nftArtifacts.code,
-        json: `{"collection":"tutorial"}`, // EXAMPLE...not by TIP-4.2
-        codeIndex: indexArtifacts.code,
-        codeIndexBasis: indexBasisArtifacts.code
-      },
-      value: locklift.utils.toNano(0.5),
-    });
-    collection = collectionContract;
+    // const { contract: collectionContract, tx } = await locklift.factory.deployContract({
+    //   contract: "newCollection",
+    //   publicKey: signer.publicKey,
+    //   initParams: {
+    //     nonce_: locklift.utils.getRandomNonce(),
+    //   },
+    //   constructorParams: {
+    //     codeIndex: indexArtifacts.code,
+    //     codeIndexBasis: indexBasisArtifacts.code,
+    //     codeNft: nftArtifacts.code,
+    //     owner: someAccount.address,
+    //     remainOnNft: locklift.utils.toNano(1),
+    //     mintingFee: locklift.utils.toNano(1),
+    //     json: "hello world",
+    //   },
+    
+    //   value: locklift.utils.toNano(2),
+    // });
 
+    const collectionContract = await locklift.factory.getDeployedContract("CollectionDrop", new Address("0:b906abecb4001b2e5c941e104beb07a25ffe5c1dfcce033df270e053da4cc639"))
+
+    collection = collectionContract;
+  
     expect(await locklift.provider.getBalance(collection.address).then(balance => Number(balance))).to.be.above(0);
   })
-  it("Deploy Tokenroot contract", async function () {      
-
-    //TokenRoot CONTRACT DEPLOY
-    const { contract: tokenRootAdded } = await locklift.factory.deployContract({
-      contract: "TokenRoot",
-      publicKey: signer.publicKey,
-      initParams: {
-        randomNonce_: 0,
-        deployer_: zeroAddress,
-        name_: "test",
-        symbol_: "tst",
-        decimals_: 3,
-        rootOwner_: someAccount.address,
-        walletCode_: (await locklift.factory.getContractArtifacts("TokenWallet")).code,
-      },
-      constructorParams: {
-        initialSupplyTo: someAccount.address, // giving tokens to our participant right here and right now
-        initialSupply: 100000000000,
-        deployWalletValue: 100000000,
-        mintDisabled: true,
-        burnByRootDisabled: true,
-        burnPaused: false,
-        remainingGasTo: someAccount.address,
-      },
-      value: locklift.utils.toNano(2),
-    });
-    tokenRoot = tokenRootAdded;
-    })
 
   it("Deploy Marketplace Collection contract", async function () {      
 
@@ -98,10 +79,9 @@ describe("Test Marketplace Contract", async function () {
         _nonce: getRandomNonce()
       },
       constructorParams: {
-        tokenRoot: TOKEN_ROOT_ADDRESS,
         sendRemainingGasTo: someAccount.address
       },
-      value: toNano(0.5),
+      value: toNano(1.5),
     });
     marketplace = marketplaceContract;
 
@@ -109,26 +89,28 @@ describe("Test Marketplace Contract", async function () {
     })
 
     it("mints an nft", async () => {
-      const res = await collection.methods.mintNft({json: JSON.stringify({"name": "shravan"})}).send({
+      const res = await collection.methods.mint({_json: JSON.stringify({"name": "shravan"})}).send({
         from: someAccount.address,
         amount: toNano(0.5)
       })
-    
-      const {nft: nftAddress} = await collection.methods.nftAddress({ answerId: 0, id: 0 }).call();
-      nft = await locklift.factory.getDeployedContract("Nft", nftAddress)
+  
+      const nft_add = await collection.methods.nftAddress({ answerId: 0, id: 0 }).call();
+      // console.log(nft.nft._address)
       
+      const nftContract = await locklift.factory.getDeployedContract("Nft", new Address( nft_add.nft._address))
+      nft = nftContract
     })
 
-    it("transfer nft to marketplace", async () => {
+    it("change nft manager", async () => {
+      // console.log({marketplace_address: marketplace.address._address, sendGas: someAccount.address._address})
+      nft.methods.changeManager({newManager: new Address( marketplace.address._address), sendGasTo: new Address(someAccount.address._address), callbacks: [[new Address(marketplace.address._address),  {value: toNano(2), payload: ""}]]}).send({from: someAccount.address, amount: toNano(3)})
+      await nft.methods.changeManager({newManager: marketplace.address, sendGasTo: someAccount.address, callbacks: [[marketplace.address, {value: toNano(2), payload: ""}]]})
 
-      await nft.methods.transfer({to: marketplace.address, sendGasTo: someAccount.address, callbacks: [[marketplace.address, {value: toNano(2), payload: ""}]]}).send({
-        from: someAccount.address,
-        amount: toNano(1)
-      })
+      const new_manager = await nft.methods.getInfo({answerId: 0}).call()
+      console.log({new_manager})
 
-      const res = await marketplace.methods.getAllNFTs().call();
+      const res = await marketplace.methods.get_nftId({answerId: 0}).call();
       console.log({res})
-
     })
   })
 })

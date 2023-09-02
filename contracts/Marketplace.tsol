@@ -9,22 +9,23 @@ pragma AbiHeader pubkey;
 import "@broxus/tip4/contracts/TIP4_1/interfaces/ITIP4_1NFT.tsol";
 // This interface to accept NFT from owner
 import "@broxus/tip4/contracts/TIP4_1/interfaces/INftTransfer.tsol";
+import "@broxus/tip4/contracts/TIP4_1/interfaces/INftChangeManager.tsol";
 // This interface for implementing tip-3 tokens receiving callback
 import "@broxus/tip3/contracts/interfaces/IAcceptTokensTransferCallback.tsol";
-// This interface for deploying TokenWallet
-import "@broxus/tip3/contracts/interfaces/ITokenRoot.tsol";
-// This interface to return lower bids
-import "@broxus/tip3/contracts/interfaces/ITokenWallet.tsol";
 
-contract Marketplace is INftTransfer {
+contract Marketplace is  INftChangeManager {
 
     uint256 static _nonce; // random nonce for affecting on address
-    address static _owner; // owner of auction and nft
+    // address _owner; // owner of auction and nft
     
-    address public _tokenRoot; // this token we will receive for bids
     address public _tokenWallet; // wallet for receive bids
     
-    uint256 private _nftId;
+    uint128 private _nftId;
+    
+    uint128 private _sale_cost;
+    uint128 private _listing_cost;
+
+    bool test = false;
 
     struct ListedToken {
         uint256 nftId;
@@ -48,135 +49,123 @@ contract Marketplace is INftTransfer {
     mapping(address => ListedToken) public address_listed_token;
 
     constructor(
-        address tokenRoot,
-        address sendRemainingGasTo
+        address sendRemainingGasTo,
+        uint128 sale_cost,
+        uint128 listing_cost
     ) public {
         tvm.accept();
-        tvm.rawReserve(0.2 ever, 0);
+        tvm.rawReserve(1 ever, 0);
 
-        _tokenRoot = tokenRoot;
-
-        ITokenRoot(_tokenRoot).deployWallet {
-            value: 0.2 ever,
-            flag: 1,
-            callback: Marketplace.onTokenWallet
-        } (
-            address(this),
-            0.1 ever
-        );
-        sendRemainingGasTo.transfer({ value: 0, flag: 128, bounce: false });
-    }
-
-    function onTokenWallet(address value) external {
-        require (
-            msg.sender.value != 0 &&
-            msg.sender == _tokenRoot,
-            101
-        );
-        tvm.rawReserve(0.2 ever, 0);
-        // just store our auction's wallet address for future interaction
-        _tokenWallet = value;
-        _owner.transfer({ value: 0, flag: 128, bounce: false });
-    }
-
-
-    function onNftTransfer(
-        uint256, // id,
-        address oldOwner,
-        address newOwner, // newOwner,
-        address, // oldManager,
-        address newManager, // newManager,
-        address, // collection,
-        address gasReceiver,
-        TvmCell // payload
-    ) override external {
-        tvm.rawReserve(0.2 ever, 0);
-        
-        uint256 nftId = _nftId;
-        ListedToken newToken = ListedToken(
-            nftId,
-            msg.sender,
-            newOwner,
-            newManager,
-            100000000,
-            true
-        );
-        id_listed_token[nftId] = newToken;
-        address_listed_token[msg.sender] = newToken;
-    }
-
-    function listToken(
-        address nft_address,
-        uint128 price
-    ) public {
-        uint256 nftId = _nftId;
-        mapping(address => ITIP4_1NFT.CallbackParams) noCallbacks;
-        TvmCell empty;
-
-        ListedToken newToken = ListedToken(
-            nftId,
-            nft_address,
-            msg.sender,
-            address(this),
-            price,
-            true
-        );
-        id_listed_token[nftId] = newToken;
-        address_listed_token[nft_address] = newToken;
-
-        _nftId = _nftId + 1;        
-        emit TokenListedSuccess(
-            nftId,
-            nft_address,
-            msg.sender,
-            address(this),
-            price,
-            true            
-        );
+      sendRemainingGasTo.transfer({ value: 0, flag: 128, bounce: false });
+      _sale_cost = sale_cost;
+      _listing_cost = listing_cost;
     }
     
-    function finishAuction(
+    function onNftChangeManager(
+        uint256 id,
+        address owner,
+        address oldManager,
+        address newManager,
+        address collection,
+        address sendGasTo,
+        TvmCell payload
+    ) override external {  
+        tvm.rawReserve(_listing_cost, 0);
+        uint128 price = abi.decode(payload, (uint128));
+     
+        uint256 nftId = _nftId;
+        ListedToken newToken = ListedToken(
+            nftId,
+            msg.sender,
+            owner,
+            newManager,
+            price,
+            true
+        );
+
+        id_listed_token[nftId] = newToken;
+        address_listed_token[msg.sender] = newToken;
+        _nftId++;
+
+        emit TokenListedSuccess(
+            nftId,
+            msg.sender,
+            owner,
+            newManager,
+            price,
+            true
+        );
+    }
+
+    function generatePayload(uint128 price) external view
+		virtual
+		responsible
+		returns (
+			TvmCell payload
+		){
+            require(price > 0, 101);
+            TvmBuilder payloadBuilder;
+            payloadBuilder.store(price);
+
+            return {value: 0, bounce: false, flag: 64} (
+				payloadBuilder.toCell()
+			);
+    }
+
+    function check_test ()external view virtual responsible returns (bool){
+        return {value: 0, bounce: false, flag: 64} (test);
+    }
+
+    function buyNft(
         address sendRemainingGasTo,
         address nft_address
     ) public {
-        // it can be finished only after endTime we set
-        require(msg.value >= 1 ever, 103);
-        // remember about gas management...and about gas constants libraries too :)
-        tvm.rawReserve(0.2 ever, 0);
-            // bid more than zero, so somebody has won! let's send NFT to winner
+    
         ListedToken nft = address_listed_token[nft_address];
-        uint256 price = nft.price;
-        address owner = nft.owner;
-        require(
-            msg.value == price,
-            101
-        ); 
-        nft.currentlyListed = false;
-        nft.owner = msg.sender;
+        uint128 price = nft.price;
 
-        mapping(address => ITIP4_1NFT.CallbackParams) noCallbacks;
-        TvmCell empty;
-        ITIP4_1NFT(nft.nft_address).transfer{
-            value: 0.1 ever,
-            flag: 1,
-            bounce: false
-        }(
-            msg.sender,
-            sendRemainingGasTo,
-            noCallbacks
-        );
-        // do not forget to send bid amount for auction owner!
-        ITokenWallet(_tokenWallet).transfer{value: 0, flag: 128}(
-            nft.price,
-            nft.owner,
-            0.1 ever,
-            sendRemainingGasTo,
-            true,
-            empty
-        );        
+
+        if (msg.value < (price + _sale_cost)) {
+            // msg.sender.transfer(msg.value, false, 64);
+            test = true;
+        } else {            
+            tvm.rawReserve(_sale_cost, 0);
+        
+            // uint256 nftId;
+            // address nft_address;
+            // address owner;
+            // address manager;
+            // uint128 price;
+            // bool currentlyListed;
+        
+            mapping(address => ITIP4_1NFT.CallbackParams) noCallbacks;
+
+            ITIP4_1NFT(nft.nft_address).transfer{
+                value: 0,
+                flag: 128,
+                bounce: false
+            }(
+                msg.sender,
+                sendRemainingGasTo,
+                noCallbacks
+            );
+
+            // nft.owner.transfer(price, false, 64);
+
+            nft.owner = msg.sender;
+            nft.manager = msg.sender;
+            nft.price = 0;
+            nft.currentlyListed = false;
+
+            address_listed_token.replace(nft_address, nft);
+        }
     }
 
-    function getAllNFTs() public view returns (ListedToken[]) {
+    function get_nftId() public view responsible returns (uint){
+        return { value: 0, flag: 64, bounce: false } ( _nftId);
+    }
+
+    function getAllNFTs() public view responsible returns (ListedToken[]) {
         uint256 nftCount = _nftId;
         ListedToken[] nfts = new ListedToken[](nftCount);
         uint256 currentIndex = 0;
@@ -187,11 +176,11 @@ contract Marketplace is INftTransfer {
                 currentIndex++;
             }
         }
-        return nfts;
+        return { value: 0, flag: 64, bounce: false }  (nfts);
     }
 
-    function get_nft_by_address (address nft_address) public view returns (ListedToken) {
+    function get_nft_by_address (address nft_address) public view responsible returns (ListedToken) {
         ListedToken token = address_listed_token[nft_address];
-        return token;
+        return { value: 0, flag: 64, bounce: false } (token);
     }
 }

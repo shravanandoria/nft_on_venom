@@ -6,46 +6,48 @@
 		{
 			"name": "constructor",
 			"inputs": [
-				{"name":"tokenRoot","type":"address"},
-				{"name":"sendRemainingGasTo","type":"address"}
+				{"name":"sendRemainingGasTo","type":"address"},
+				{"name":"sale_cost","type":"uint128"},
+				{"name":"listing_cost","type":"uint128"}
 			],
 			"outputs": [
 			]
 		},
 		{
-			"name": "onTokenWallet",
+			"name": "onNftChangeManager",
 			"inputs": [
-				{"name":"value","type":"address"}
-			],
-			"outputs": [
-			]
-		},
-		{
-			"name": "onNftTransfer",
-			"inputs": [
-				{"name":"value0","type":"uint256"},
-				{"name":"oldOwner","type":"address"},
-				{"name":"newOwner","type":"address"},
-				{"name":"value3","type":"address"},
+				{"name":"id","type":"uint256"},
+				{"name":"owner","type":"address"},
+				{"name":"oldManager","type":"address"},
 				{"name":"newManager","type":"address"},
-				{"name":"value5","type":"address"},
-				{"name":"gasReceiver","type":"address"},
-				{"name":"value7","type":"cell"}
+				{"name":"collection","type":"address"},
+				{"name":"sendGasTo","type":"address"},
+				{"name":"payload","type":"cell"}
 			],
 			"outputs": [
 			]
 		},
 		{
-			"name": "listToken",
+			"name": "generatePayload",
 			"inputs": [
-				{"name":"nft_address","type":"address"},
+				{"name":"answerId","type":"uint32"},
 				{"name":"price","type":"uint128"}
 			],
 			"outputs": [
+				{"name":"payload","type":"cell"}
 			]
 		},
 		{
-			"name": "finishAuction",
+			"name": "check_test",
+			"inputs": [
+				{"name":"answerId","type":"uint32"}
+			],
+			"outputs": [
+				{"name":"value0","type":"bool"}
+			]
+		},
+		{
+			"name": "buyNft",
 			"inputs": [
 				{"name":"sendRemainingGasTo","type":"address"},
 				{"name":"nft_address","type":"address"}
@@ -54,8 +56,18 @@
 			]
 		},
 		{
+			"name": "get_nftId",
+			"inputs": [
+				{"name":"answerId","type":"uint32"}
+			],
+			"outputs": [
+				{"name":"value0","type":"uint256"}
+			]
+		},
+		{
 			"name": "getAllNFTs",
 			"inputs": [
+				{"name":"answerId","type":"uint32"}
 			],
 			"outputs": [
 				{"components":[{"name":"nftId","type":"uint256"},{"name":"nft_address","type":"address"},{"name":"owner","type":"address"},{"name":"manager","type":"address"},{"name":"price","type":"uint128"},{"name":"currentlyListed","type":"bool"}],"name":"value0","type":"tuple[]"}
@@ -64,18 +76,11 @@
 		{
 			"name": "get_nft_by_address",
 			"inputs": [
+				{"name":"answerId","type":"uint32"},
 				{"name":"nft_address","type":"address"}
 			],
 			"outputs": [
 				{"components":[{"name":"nftId","type":"uint256"},{"name":"nft_address","type":"address"},{"name":"owner","type":"address"},{"name":"manager","type":"address"},{"name":"price","type":"uint128"},{"name":"currentlyListed","type":"bool"}],"name":"value0","type":"tuple"}
-			]
-		},
-		{
-			"name": "_tokenRoot",
-			"inputs": [
-			],
-			"outputs": [
-				{"name":"_tokenRoot","type":"address"}
 			]
 		},
 		{
@@ -104,8 +109,7 @@
 		}
 	],
 	"data": [
-		{"key":1,"name":"_nonce","type":"uint256"},
-		{"key":2,"name":"_owner","type":"address"}
+		{"key":1,"name":"_nonce","type":"uint256"}
 	],
 	"events": [
 		{
@@ -127,10 +131,11 @@
 		{"name":"_timestamp","type":"uint64"},
 		{"name":"_constructorFlag","type":"bool"},
 		{"name":"_nonce","type":"uint256"},
-		{"name":"_owner","type":"address"},
-		{"name":"_tokenRoot","type":"address"},
 		{"name":"_tokenWallet","type":"address"},
-		{"name":"_nftId","type":"uint256"},
+		{"name":"_nftId","type":"uint128"},
+		{"name":"_sale_cost","type":"uint128"},
+		{"name":"_listing_cost","type":"uint128"},
+		{"name":"test","type":"bool"},
 		{"components":[{"name":"nftId","type":"uint256"},{"name":"nft_address","type":"address"},{"name":"owner","type":"address"},{"name":"manager","type":"address"},{"name":"price","type":"uint128"},{"name":"currentlyListed","type":"bool"}],"name":"id_listed_token","type":"map(uint256,tuple)"},
 		{"components":[{"name":"nftId","type":"uint256"},{"name":"nft_address","type":"address"},{"name":"owner","type":"address"},{"name":"manager","type":"address"},{"name":"price","type":"uint128"},{"name":"currentlyListed","type":"bool"}],"name":"address_listed_token","type":"map(address,tuple)"}
 	]
